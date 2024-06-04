@@ -1,0 +1,52 @@
+[ ZADANIE 1 ]
+
+Plik 1 - average_speed.py
+def average_speed(distance, time):
+    speed = distance / time
+    return speed
+Plik 2 - main.py
+import average_speed
+
+distance = float(input("Podaj pokonany dystans (w km): "))
+time = float(input("Podaj czas biegu (w godz.): "))
+
+print(f"Twoja średnia prędkość to: {average_speed.average_speed(distance, time)}")
+
+###################################################################################
+
+[ ZADANIE 2]
+
+import math
+
+def length_side_c(side_a, side_b):
+    side_c = math.sqrt(math.pow(side_a, 2) + math.pow(side_b, 2))
+    return side_c
+
+a = float(input("Podaj długość Boku A: "))
+b = float(input("Podaj długość Boku B: "))
+c = length_side_c(a, b)
+print(f"Długość przeciwprostokątnej to: {c}.")
+
+###################################################################################
+
+[ ZADANIE 3]
+
+Pakiet 'calculations'
+pliki: __init__.py, deposit_calculation.py
+
+plik: deposit_calculation.py
+
+def deposit_value(starting_amount, percentage, period):
+    value_deposit = starting_amount * (1 + percentage / 100) ** period
+
+    return value_deposit
+
+plik: main.py
+import calculations.deposit_calculation
+
+starting_amount = float(input("Kwota wpłaty na lokatę (w PLN): "))
+percentage = float(input("Oprocentowanie lokaty: "))
+period = int(input("Na ile lat lokata: "))
+
+ending_amount = calculations.deposit_calculation.deposit_value(starting_amount, percentage, period)
+print(f"Po {period} latach wartość Twojej lokaty wyniesie: {ending_amount}")
