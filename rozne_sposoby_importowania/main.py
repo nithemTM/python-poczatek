@@ -45,7 +45,7 @@ def run():
             break
         else:
             print(
-                f'Nie ma takiego produktu w sklepie, poniżej dostępne:'
+                f'Nie ma takiego produktu w sklepie! Poniżej dostępne do wyboru:'
                 f' {list(products.keys())}')
 
     print(f"Zamówienie"
