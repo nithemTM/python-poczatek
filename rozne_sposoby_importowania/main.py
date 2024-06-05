@@ -47,7 +47,6 @@ def run():
             print(
                 f'Nie ma takiego produktu w sklepie! Poniżej dostępne do wyboru:'
                 1
-2
 
                 
                 f' {list(products.keys())}')
