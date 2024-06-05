@@ -1,6 +1,6 @@
 # ZADANIE 1
-# from rozne_sposoby_importowania.store.create_order import make_order
-# from rozne_sposoby_importowania.store.products import products
+# from a1_2_rozne_sposoby_importowania.store.create_order import make_order
+# from a1_2_rozne_sposoby_importowania.store.products import products
 #
 #
 # print("Witamy w sklepie!")
@@ -26,11 +26,13 @@
 
 
 # ZADANIE 2
-
+# from a1_2_rozne_sposoby_importowania.store import products  -> absolutnie
+# from .products import products                          -> względnie
 
 # ZADANIE 3
-from rozne_sposoby_importowania.store.create_order import make_order
-from rozne_sposoby_importowania.store.products import products
+from a1_2_rozne_sposoby_importowania.store.create_order import make_order
+from a1_2_rozne_sposoby_importowania.store.products import products
+
 
 def run():
     print("Witamy w sklepie!")

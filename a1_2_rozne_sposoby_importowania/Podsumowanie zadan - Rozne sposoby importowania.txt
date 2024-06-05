@@ -1,0 +1,111 @@
+ZADANIE 1
+
+plik: main.py
+
+from a1_2_rozne_sposoby_importowania.store.create_order import make_order
+from a1_2_rozne_sposoby_importowania.store.products import products
+
+
+print("Witamy w sklepie!")
+print("Dostepne produkty:")
+print(list(products.keys()))
+
+while True:
+    product_ord = input("Produkt: ")
+    if product_ord in products:
+        quantity_ord = int(input("Sztuki: "))
+        order = dict(make_order(product_ord, quantity_ord))
+        break
+    else:
+        print(
+            f'Nie ma takiego produktu w sklepie, poniżej dostępne:'
+            f' {list(products.keys())}')
+
+print(f"Zamówienie"
+        f'\nProdukt: {order["product"]}'
+        f'\nIlość sztuk: {order["quantity_ord"]}'
+        f'\nCałkowity koszt: {order["payment"]}'
+      )
+
+Pakiet 'store'
+pliki: __init__.py, products.py, create_order.py
+
+plik: products.py
+
+products = {
+    "bread": {
+        "quantity": 20,
+        "price": 4
+    },
+    "garlic": {
+        "quantity": 30,
+        "price": 2
+    }
+}
+
+plik: create_order.py
+
+from różne_sposoby_importowania.store.products import products
+
+orders = []
+
+
+def make_order(product, quantity_ord):
+
+    if products[product]["quantity"] >= quantity_ord:
+        products[product]["quantity"] -= quantity_ord
+        payment = products[product]["price"] * quantity_ord
+        one_order = {
+            "product": product,
+            "quantity_ord": quantity_ord,
+            "payment": payment
+        }
+        orders.append(one_order)
+        return one_order
+    else:
+        print(f'Niewystarczająca ilość art w zapasie sklepu! możesz zamówić max. {products[product]["quantity"]}')
+
+
+###################################################################################
+
+ZADANIE 2
+
+#from a1_2_rozne_sposoby_importowania.store import products  -> absolutnie
+from .products import products                          -> względnie
+
+
+###################################################################################
+
+
+ZADANIE 3
+
+Zmiany dotyczą pliku poniższego pliku
+plik: main.py
+
+from a1_2_rozne_sposoby_importowania.store.create_order import make_order
+from a1_2_rozne_sposoby_importowania.store.products import products
+
+def run():
+    print("Witamy w sklepie!")
+    print("Dostepne produkty:")
+    print(list(products.keys()))
+
+    while True:
+        product_ord = input("Produkt: ")
+        if product_ord in products:
+            quantity_ord = int(input("Sztuki: "))
+            order = dict(make_order(product_ord, quantity_ord))
+            break
+        else:
+            print(
+                f'Nie ma takiego produktu w sklepie, poniżej dostępne:'
+                f' {list(products.keys())}')
+
+    print(f"Zamówienie"
+          f'\nProdukt: {order["product"]}'
+          f'\nIlość sztuk: {order["quantity_ord"]}'
+          f'\nCałkowity koszt: {order["payment"]}'
+          )
+
+if __name__ == "__main__":
+    run()

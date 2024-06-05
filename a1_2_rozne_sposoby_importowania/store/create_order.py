@@ -1,4 +1,4 @@
-#from rozne_sposoby_importowania.store.products import products
+#from a1_2_rozne_sposoby_importowania.store.products import products
 from .products import products
 
 orders = []
