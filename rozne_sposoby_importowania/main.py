@@ -48,7 +48,6 @@ def run():
                 f'Nie ma takiego produktu w sklepie! Poniżej dostępne do wyboru:'
                 # 1
                 # 2
-                # 3
 
                 
                 f' {list(products.keys())}')
