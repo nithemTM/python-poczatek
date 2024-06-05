@@ -49,7 +49,6 @@ def run():
                 
                 
                 
-                
                 f' {list(products.keys())}')
 
     print(f"Zamówienie"
