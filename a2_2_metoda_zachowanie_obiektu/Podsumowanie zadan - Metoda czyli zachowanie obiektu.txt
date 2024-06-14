@@ -1,5 +1,5 @@
 
-#ZADANIE 1
+#ZADANIE 1-2
 
 Plik: main.py
 
@@ -128,23 +128,135 @@ class Potato:
 
 
 
-###################################################################################
-
-
-#ZADANIE 2
-
-
-
-
-
-
-
 
 ###################################################################################
 
 
 #ZADANIE 3
 
+from a2_2_metoda_zachowanie_obiektu.shop.order import Order, generate_order
+from a2_2_metoda_zachowanie_obiektu.shop.product import Product
+from a2_2_metoda_zachowanie_obiektu.shop.apple import Apple
+from a2_2_metoda_zachowanie_obiektu.shop.potato import Potato
+from a2_2_metoda_zachowanie_obiektu.shop.order_element import OrderElement
+
+
+def call_object():
+    # Zad 3
+
+    auto = Product(name="Honda Accord", category_name="Cars", unit_price=120000)
+    circular_saw = Product(name="Bosh Circular X100", category_name="Saw", unit_price=1000)
+
+    auto.print_product()
+    circular_saw.print_product()
+
+    product_1 = OrderElement(product_info=auto,quantity_ord=2)
+    product_2 = OrderElement(product_info=circular_saw,quantity_ord=9)
+    product_list = [product_1, product_2]
+    order_1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", order_elements=product_list)
+    order_1.print_order()
+    generate_order()
+
+
+
+
+
+if __name__ == "__main__":
+    call_object()
+
+
+
+Pakiet: shop
+pliki ( __init__.py, order.py, product.py, apple.py, potato.py)
+
+plik: order.py
+
+import random
+from a2_2_metoda_zachowanie_obiektu.shop.product import Product
+from a2_2_metoda_zachowanie_obiektu.shop.order_element import OrderElement
+
+
+class Order:
+    def __init__(self, customer_first_name, customer_last_name, order_elements=None):
+        self.customer_first_name = customer_first_name
+        self.customer_last_name = customer_last_name
+
+        if order_elements is None:
+            order_elements = []
+
+        self.order_elements = order_elements
+        self.total_price = self.total_price_f()
+
+    def total_price_f(self):
+        total_price = 0
+        for element in self.order_elements:
+            total_price += element.total_price_f()
+
+        return total_price
+
+    def print_order(self):
+        print('[ Show order ]')
+        print(f'Customer Data: {self.customer_first_name} {self.customer_last_name}')
+        print(f'Items of Order:')
+        for element in self.order_elements:
+            element.print_info()
+        print(f'Total cost of order: {self.total_price}')
+
+
+def generate_order():
+
+    a = random.randint(7, 20)
+    order_elements = []
+    b = random.sample(range(1, a + 1), 6)
+    for prod in b:
+        product = Product(name=f"Product-{str(prod)}", category_name=f"Some category-{prod}",
+                          unit_price=random.randint(1, 50))
+
+        element = OrderElement(product_info=product, quantity_ord=random.randint(1, 10))
+        order_elements.append(element)
+
+    random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                         order_elements=order_elements)
+    random_order.print_order()
+
+
+plik: product.py
+
+class Product:
+    def __init__(self, name, category_name, unit_price):
+        self.name = name
+        self.category_name = category_name
+        self.unit_price = int(unit_price)
+
+    def print_product(self):
+        print(f'Name: {self.name} - Category: {self.category_name} - Unit Price: {self.unit_price}')
+
+
+plik: apple.py
+
+class Apple:
+    def __init__(self, species, size, price):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+plik: potato.py
+
+class Potato:
+    def __init__(self, species="Lord", size=1, price=0):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
 
 
 

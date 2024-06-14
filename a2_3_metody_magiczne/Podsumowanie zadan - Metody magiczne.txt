@@ -1,0 +1,227 @@
+
+#ZADANIE 1-4
+Plik: main.py
+
+from a2_3_metody_magiczne.shop.order import Order, generate_order
+from a2_3_metody_magiczne.shop.product import Product
+from a2_3_metody_magiczne.shop.apple import Apple
+from a2_3_metody_magiczne.shop.potato import Potato
+from a2_3_metody_magiczne.shop.order_element import OrderElement
+
+
+def call_object():
+
+    # Zad 1
+    auto = Product(name="Honda Accord", category_name="Cars", unit_price=120000)
+    circular_saw = Product(name="Bosh Circular X100", category_name="Saw", unit_price=1000)
+
+    print(auto)
+    print(circular_saw)
+
+    product_1 = OrderElement(product_info=auto,quantity_ord=2)
+    product_2 = OrderElement(product_info=circular_saw,quantity_ord=9)
+    product_list = [product_1, product_2]
+    product_list_1 = [product_1, product_1]
+    order_1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", order_elements=product_list)
+
+    print(order_1)
+    # Zad 3
+    print(f"Number of order items: {len(order_1)}")
+
+    generate_order()
+
+    # Zad 2
+    apple = Apple("Special", 2, 3)
+    potato = Potato("Lord",1,4)
+    print(apple)
+    print(potato)
+
+    # Zad 4a
+    auto2 = Product(name="Honda Accord", category_name="Cars", unit_price=120000)
+    circular_saw2 = Product(name="Bosh Circular X101", category_name="Saw", unit_price=1000)
+
+    print(f"auto = {auto}")
+    print(f"auto2 = {auto2}")
+    print(f"circular_saw = {circular_saw}")
+    print(f"circular_saw2 = {circular_saw2}")
+    print(f"Czy auto == auto2? {auto == auto2}")
+    print(f"Czy circular_saw == circular_saw2? {circular_saw == circular_saw2}")
+
+    # Zad 4b
+    order_2 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", order_elements=product_list)
+    print(f"Czy pozycja 1 w zamówieniu order_2 == 2 pozycji? {order_2.order_elements[0] == order_2.order_elements[1]}")
+    order_3 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", order_elements=product_list_1)
+    print(f"Czy pozycja 1 w zamówieniu order_3 == 2 pozycji? {order_3.order_elements[0] == order_3.order_elements[1]}")
+
+    # Zad 4c
+    order_4 = Order(customer_first_name="Michał", customer_last_name="Tokarski", order_elements=product_list_1)
+    print(f"Czy zamówienie order_3 == zamówieniu order_4? {order_3 == order_4}")
+    print(f"Czy zamówienie order_2 == zamówieniu order_3? {order_2 == order_3}")
+    print(f"Czy zamówienie order_2 == zamówieniu order_2? {order_2 == order_2}")
+
+
+if __name__ == "__main__":
+    call_object()
+
+
+
+Pakiet: shop
+pliki ( __init__.py, order.py, order_element.py product.py, apple.py, potato.py)
+
+plik: order.py
+
+import random
+from a2_3_metody_magiczne.shop.product import Product
+from a2_3_metody_magiczne.shop.order_element import OrderElement
+
+
+class Order:
+    def __init__(self, customer_first_name, customer_last_name, order_elements=None):
+        self.customer_first_name = customer_first_name
+        self.customer_last_name = customer_last_name
+
+        if order_elements is None:
+            order_elements = []
+
+        self.order_elements = order_elements
+        self.total_price = self.total_price_f()
+
+    # Zad 1
+    def __str__(self):
+        element_print = ""
+        for element in self.order_elements:
+            element_print += "\n"
+            element_print += str(element)
+
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}')
+
+    # Zad 3
+    def __len__(self):
+        return len(self.order_elements)
+
+    # Zad 4c
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+
+        if len(self.order_elements) != len(other.order_elements):
+            return False
+
+        if self.customer_first_name != other.customer_first_name or self.customer_last_name != other.customer_last_name:
+            return False
+
+        for element in self.order_elements:
+            if element not in other.order_elements:
+                return False
+        return True
+
+    def total_price_f(self):
+        total_price = 0
+        for element in self.order_elements:
+            total_price += element.total_price_f()
+
+        return total_price
+
+
+def generate_order():
+
+    a = random.randint(7, 20)
+    order_elements = []
+    b = random.sample(range(1, a + 1), 6)
+    for prod in b:
+        product = Product(name=f"Product-{str(prod)}", category_name=f"Some category-{prod}",
+                          unit_price=random.randint(1, 50))
+
+        element = OrderElement(product_info=product, quantity_ord=random.randint(1, 10))
+        order_elements.append(element)
+
+    random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                         order_elements=order_elements)
+    print(random_order)
+    # Zad 3
+    print(f"Number of order items: {len(random_order)}")
+
+
+plik: product.py
+
+class Product:
+    def __init__(self, name, category_name, unit_price):
+        self.name = name
+        self.category_name = category_name
+        self.unit_price = int(unit_price)
+
+    # Zad 1
+    def __str__(self):
+        return f'Name: {self.name} - Category: {self.category_name} - Unit Price: {self.unit_price}'
+
+    # Zad 4a
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+        return (
+                self.name == other.name
+                and self.category_name == other.category_name
+                and self.unit_price == other.unit_price
+        )
+
+
+plik: order_element.py
+
+
+class OrderElement:
+    def __init__(self, product_info, quantity_ord):
+        self.product_info = product_info
+        self.quantity_ord = quantity_ord
+
+    # Zad 1
+    def __str__(self):
+        return f'{self.product_info}\n\t\t x {self.quantity_ord}'
+
+    # Zad 4b
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+        return self.product_info == other.product_info and self.quantity_ord == other.quantity_ord
+
+    def total_price_f(self):
+        return self.product_info.unit_price * self.quantity_ord
+
+
+
+plik: apple.py
+
+class Apple:
+    def __init__(self, species, size, price):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    # Zad 2
+    def __repr__(self):
+        return f"APPLE data: [Species - {self.species}, Size - {self.size}, Price - {self.price}, Total Price - {self.total_price}]"
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+plik: potato.py
+
+class Potato:
+    def __init__(self, species="Lord", size=1, price=0):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    # Zad 2
+    def __repr__(self):
+        return f"POTATO data: [Species - {self.species}, Size - {self.size}, Price - {self.price}, Total Price - {self.total_price}]"
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+

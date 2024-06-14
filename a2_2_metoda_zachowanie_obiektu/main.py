@@ -21,12 +21,7 @@ def call_object():
     order_1.print_order()
     generate_order()
 
-    # apple_ord = Apple(species="Golden", size=1, price=3)
-    # potato_ord = Potato(species="Lord", size=2, price=4)
-    # apple_ord.total_price_f(10)
-    # potato_ord.total_price_f(15)
-    # print(f'Cena jabłek total: {apple_ord.total_price}')
-    # print(f'Cena ziemniaków total: {potato_ord.total_price}')
+
 
 
 
