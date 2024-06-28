@@ -1,4 +1,4 @@
-from a2_6__funkcja_jako_obiekt.shop.tax_calculator import TaxCalculator
+from a2_6_funkcja_jako_obiekt.shop.tax_calculator import TaxCalculator
 
 
 class OrderElement:
