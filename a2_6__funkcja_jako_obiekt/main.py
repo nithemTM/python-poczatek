@@ -1,9 +1,9 @@
-from a2_6_funkcja_jako_obiekt.shop.order import Order
-from a2_6_funkcja_jako_obiekt.shop.discount_policy import default_policy, discount_all_item, discount_holiday
-# from a2_6_funkcja_jako_obiekt.shop.product import Product
-# from a2_6_funkcja_jako_obiekt.shop.apple import Apple
-# from a2_6_funkcja_jako_obiekt.shop.potato import Potato
-# from a2_6_funkcja_jako_obiekt.shop.order_element import OrderElement
+from a2_6__funkcja_jako_obiekt.shop.order import Order
+from a2_6__funkcja_jako_obiekt.shop.discount_policy import default_policy, discount_all_item, discount_holiday
+# from a2_6__funkcja_jako_obiekt.shop.product import Product
+# from a2_6__funkcja_jako_obiekt.shop.apple import Apple
+# from a2_6__funkcja_jako_obiekt.shop.potato import Potato
+# from a2_6__funkcja_jako_obiekt.shop.order_element import OrderElement
 
 
 # Zad 1
