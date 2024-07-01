@@ -2,14 +2,18 @@
 #ZADANIE 1
 Plik: main.py
 
-from a2_7_lambda_funkcja_anonimowa.shop.order import Order
-from a2_7_lambda_funkcja_anonimowa.shop.discount_policy import default_policy, discount_all_item, discount_holiday
+from a3_1_prosta_refaktoryzacja.shop.order import Order
+from a3_1_prosta_refaktoryzacja.shop.discount_policy import default_policy, discount_all_item, discount_holiday
+from a3_1_prosta_refaktoryzacja.shop.data_generator import generate_order
 
+
+def sort_order_elements(order):
+    return order.total_price
 
 
 def call_object():
 
-    order_elements = Order.generate_order(5)
+    order_elements = generate_order(7)
     random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
                          order_elements=order_elements, discount_policy=discount_holiday)
     rando_order1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
@@ -18,8 +22,7 @@ def call_object():
                          order_elements=order_elements)
 
     random_orders = [random_order, rando_order1, rando_order2]
-    # Zad 1
-    random_orders.sort(key=lambda order1: order1.total_price)
+    random_orders.sort(key=sort_order_elements)
     print("Zamówienia po sortowaniu:")
     for i, order in enumerate(random_orders):
         print(f"\nZAMÓWIENIE: {i+1}\n\n{order}")
@@ -32,20 +35,16 @@ if __name__ == "__main__":
 
 
 Pakiet: shop
-pliki ( __init__.py, order.py, discount_policy.py, order_element.py product.py, apple.py, potato.py, tax_calculator.py)
+pliki ( __init__.py, order.py, discount_policy.py, order_element.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
 
 plik: order.py
 
-import random
-from a2_7_lambda_funkcja_anonimowa.shop.product import Product
-from a2_7_lambda_funkcja_anonimowa.shop.order_element import OrderElement
-from a2_7_lambda_funkcja_anonimowa.shop.discount_policy import default_policy, discount_all_item, discount_holiday
-from a2_7_lambda_funkcja_anonimowa.shop.tax_calculator import TaxCalculator
+from a3_1_prosta_refaktoryzacja.shop.order_element import OrderElement
 
 
 class Order:
 
-    MAX_ELEMENT_ORDER = 5
+    MAX_ELEMENT_ORDER = 10
 
     def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None):
         self.customer_first_name = customer_first_name
@@ -92,6 +91,7 @@ class Order:
         total_price = 0
         for element in self._order_elements:
             total_price += element.total_price_f()
+
         if self.discount_policy:
             return self.discount_policy(total_price)
         else:
@@ -105,28 +105,6 @@ class Order:
             self.total_price = self._total_price_f()
         else:
             print("Note! Can't create new item, to much elements of this order.")
-
-    @classmethod
-    def generate_order(cls, max_element):
-
-        a = random.randint(max_element+1, max_element+13)
-        order_elements = []
-        b = random.sample(range(1, a + 1), max_element)
-        for i, prod in enumerate(b):
-
-            if i % 2 == 0:
-                category = "Owoce i warzywa"
-            elif i % 3 == 0:
-                category = "Jedzenie"
-            else:
-                category = f"Some category-{prod}"
-            product = Product(name=f"Product-{str(prod)}", category_name=category,
-                              unit_price=random.randint(1, 50))
-
-            element = OrderElement(product_info=product, quantity_ord=random.randint(1, 10))
-            order_elements.append(element)
-
-        return order_elements
 
 
 
@@ -172,7 +150,7 @@ def discount_holiday(total_price):
 
 plik: order_element.py
 
-from a2_7_lambda_funkcja_anonimowa.shop.tax_calculator import TaxCalculator
+from a3_1_prosta_refaktoryzacja.shop.tax_calculator import TaxCalculator
 
 
 class OrderElement:
@@ -192,6 +170,45 @@ class OrderElement:
     def total_price_f(self):
         return self.product_info.unit_price * self.quantity_ord
 
+
+
+plik: data_generator.py
+
+# Zad 1a
+import random
+from a3_1_prosta_refaktoryzacja.shop.order_element import OrderElement
+from a3_1_prosta_refaktoryzacja.shop.product import Product
+from a3_1_prosta_refaktoryzacja.shop.order import Order
+
+# Zad 1c
+UNIT_PRICE_MIN = 1
+UNIT_PRICE_MAX = 50
+QUANTITY_MIN = 1
+QUANTITY_MAX = 10
+
+
+# Zad 1b
+def generate_order(max_element=None):
+
+    if max_element is None:
+        max_element = random.randint(1, Order.MAX_ELEMENT_ORDER)
+    order_elements = []
+    element_sample = random.sample(range(1, max_element + 20), max_element)
+    for i, prod in enumerate(element_sample):
+
+        if i % 2 == 0:
+            category = "Owoce i warzywa"
+        elif i % 3 == 0:
+            category = "Jedzenie"
+        else:
+            category = f"Some category-{prod}"
+        product = Product(name=f"Product-{str(prod)}", category_name=category,
+                          unit_price=random.randint(UNIT_PRICE_MIN, UNIT_PRICE_MAX))
+
+        element = OrderElement(product_info=product, quantity_ord=random.randint(QUANTITY_MIN, QUANTITY_MAX))
+        order_elements.append(element)
+
+    return order_elements
 
 
 

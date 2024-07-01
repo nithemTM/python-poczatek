@@ -1,14 +1,9 @@
-import random
-from a2_7_lambda_funkcja_anonimowa.shop.product import Product
-from a2_7_lambda_funkcja_anonimowa.shop.order_element import OrderElement
-from a2_7_lambda_funkcja_anonimowa.shop.discount_policy import default_policy, discount_all_item, discount_holiday
-from a2_7_lambda_funkcja_anonimowa.shop.tax_calculator import TaxCalculator
+from a3_1_prosta_refaktoryzacja.shop.order_element import OrderElement
 
 
 class Order:
 
-    MAX_ELEMENT_ORDER = 5
-    # Zad 2
+    MAX_ELEMENT_ORDER = 10
 
     def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None):
         self.customer_first_name = customer_first_name
@@ -55,7 +50,7 @@ class Order:
         total_price = 0
         for element in self._order_elements:
             total_price += element.total_price_f()
-        # Zad 2
+
         if self.discount_policy:
             return self.discount_policy(total_price)
         else:
@@ -70,25 +65,4 @@ class Order:
         else:
             print("Note! Can't create new item, to much elements of this order.")
 
-    @classmethod
-    def generate_order(cls, max_element):
-
-        a = random.randint(max_element+1, max_element+13)
-        order_elements = []
-        b = random.sample(range(1, a + 1), max_element)
-        for i, prod in enumerate(b):
-
-            if i % 2 == 0:
-                category = "Owoce i warzywa"
-            elif i % 3 == 0:
-                category = "Jedzenie"
-            else:
-                category = f"Some category-{prod}"
-            product = Product(name=f"Product-{str(prod)}", category_name=category,
-                              unit_price=random.randint(1, 50))
-
-            element = OrderElement(product_info=product, quantity_ord=random.randint(1, 10))
-            order_elements.append(element)
-
-        return order_elements
 

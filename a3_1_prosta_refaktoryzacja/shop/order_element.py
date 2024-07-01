@@ -1,4 +1,4 @@
-from a2_7_lambda_funkcja_anonimowa.shop.tax_calculator import TaxCalculator
+from a3_1_prosta_refaktoryzacja.shop.tax_calculator import TaxCalculator
 
 
 class OrderElement:

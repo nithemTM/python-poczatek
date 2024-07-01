@@ -1,28 +1,24 @@
-from a2_7_lambda_funkcja_anonimowa.shop.order import Order
-from a2_7_lambda_funkcja_anonimowa.shop.discount_policy import default_policy, discount_all_item, discount_holiday
-# from a2_7_lambda_funkcja_anonimowa.shop.product import Product
-# from a2_7_lambda_funkcja_anonimowa.shop.apple import Apple
-# from a2_7_lambda_funkcja_anonimowa.shop.potato import Potato
-# from a2_7_lambda_funkcja_anonimowa.shop.order_element import OrderElement
+from a3_1_prosta_refaktoryzacja.shop.order import Order
+from a3_1_prosta_refaktoryzacja.shop.discount_policy import default_policy, discount_all_item, discount_holiday
+from a3_1_prosta_refaktoryzacja.shop.data_generator import generate_order
 
 
-# Zad 1
-# def sort_order_elements(order):
-#     return order.total_price
+def sort_order_elements(order):
+    return order.total_price
 
 
 def call_object():
-    # Zad 2
-    order_elements = Order.generate_order(5)
+
+    order_elements = generate_order(7)
     random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
                          order_elements=order_elements, discount_policy=discount_holiday)
     rando_order1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
                          order_elements=order_elements, discount_policy=discount_all_item)
     rando_order2 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
                          order_elements=order_elements)
-    # Zad 1
+
     random_orders = [random_order, rando_order1, rando_order2]
-    random_orders.sort(key=lambda order1: order1.total_price)
+    random_orders.sort(key=sort_order_elements)
     print("Zamówienia po sortowaniu:")
     for i, order in enumerate(random_orders):
         print(f"\nZAMÓWIENIE: {i+1}\n\n{order}")
