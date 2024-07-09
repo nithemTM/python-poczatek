@@ -1,48 +1,25 @@
-
 #ZADANIE 1
 Plik: main.py
 
-from a3_2_property.shop.order import Order
-from a3_2_property.shop.discount_policy import default_policy, discount_all_item, discount_holiday
-from a3_2_property.shop.data_generator import generate_order
+from a3_3_dziedziczenie.shop.product import ProductTerm
 
-
-def sort_order_elements(order):
-    return order.total_price
-
-
+# Zad 1
 def call_object():
+    frozen_pizza = ProductTerm(name="Pizza margherita", category_name="Italian Food", unit_price=20, year_production=2020, amount_years=4)
 
-    order_elements = generate_order(7)
-    random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
-                         order_elements=order_elements, discount_policy=discount_holiday)
-    # Zad 1
-    print("[ZAMÓWIENIE random_order]\n")
-
-    for i, element in enumerate(random_order.order_elements):
-        print(f"\nelment: {i+1}\n{element}")
-
-    print(f"\nZAMÓWIENIE:\n\n{random_order}")
-
-    # Zad 2
-
-    new_elements_order = generate_order(4)
-    random_order.order_elements = new_elements_order
-
-    print(f"\nZAMÓWIENIE_NEW:\n\n{random_order}")
-
-    new_elements_too_much = generate_order(15)
-    random_order.order_elements = new_elements_too_much
-
-    print(f"\nZAMÓWIENIE_TOO_MUCH:\n\n{random_order}")
+    print(frozen_pizza.does_expire(2024))
+    print(frozen_pizza.does_expire(2026))
 
 
-Pakiet: shop
+if __name__ == "__main__":
+    call_object()
+
+
 pliki ( __init__.py, order.py, discount_policy.py, order_element.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
 
 plik: order.py
 
-from a3_2_property.shop.order_element import OrderElement
+from a3_3_dziedziczenie.shop.order_element import OrderElement
 
 
 class Order:
@@ -91,12 +68,10 @@ class Order:
                 return False
         return True
 
-    # Zad 1
     @property
     def order_elements(self):
         return self._order_elements
 
-    # Zad 2
     @order_elements.setter
     def order_elements(self, value):
         if len(value) < Order.MAX_ELEMENT_ORDER:
@@ -105,7 +80,6 @@ class Order:
             self._order_elements = value[:Order.MAX_ELEMENT_ORDER]
         # self.total_price, self.discount = self._total_price_f()
 
-    # Zad 3
     @property
     def total_price(self):
         return self._total_price_f()
@@ -152,29 +126,26 @@ class Product:
                 and self.unit_price == other.unit_price
         )
 
+# Zad 1
+class ProductTerm(Product):
 
-plik: discount_policy.py
+    def __init__(self, name, category_name, unit_price, year_production, amount_years):
+        super().__init__(name, category_name, unit_price)
+        self.year_production = year_production
+        self.amount_years = amount_years
 
-def default_policy(total_price):
-    return total_price, "none"
+    def does_expire(self, current_year):
+        if (current_year - self.year_production) > self.amount_years:
+            return True
+        else:
+            return False
 
-
-def discount_all_item(total_price):
-
-    return total_price * 0.95, "loyal"
-
-
-def discount_holiday(total_price):
-
-    if total_price > 500:
-        return total_price - 20, "holiday"
-    else:
-        return total_price, "none"
 
 
 plik: order_element.py
 
-from a3_2_property.shop.tax_calculator import TaxCalculator
+
+from a3_3_dziedziczenie.shop.tax_calculator import TaxCalculator
 
 
 class OrderElement:
@@ -196,13 +167,12 @@ class OrderElement:
 
 
 
-
 plik: data_generator.py
 
 import random
-from a3_2_property.shop.order_element import OrderElement
-from a3_2_property.shop.product import Product
-from a3_2_property.shop.order import Order
+from a3_3_dziedziczenie.shop.order_element import OrderElement
+from a3_3_dziedziczenie.shop.product import Product
+from a3_3_dziedziczenie.shop.order import Order
 
 
 UNIT_PRICE_MIN = 1
@@ -277,3 +247,4 @@ class TaxCalculator:
             return round(total_price * 0.08, 2)
         else:
             return round(total_price * 0.20, 2)
+
