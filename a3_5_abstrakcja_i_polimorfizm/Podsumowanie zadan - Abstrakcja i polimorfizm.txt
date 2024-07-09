@@ -1,19 +1,34 @@
+
 #ZADANIE 1
 Plik: main.py
 
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.order import Order, ExpressOrder
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.data_generator import generate_order
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.discount_policy import default_policy, discount_all_item, discount_holiday
+from a3_5_abstrakcja_i_polimorfizm.shop.order import Order, ExpressOrder
+from a3_5_abstrakcja_i_polimorfizm.shop.data_generator import generate_order
+from a3_5_abstrakcja_i_polimorfizm.shop.discount_policy import DiscountPolicy, PercentageDiscount, AbsoluteDiscount
 
 
 def call_object():
-
     # Zad 1
-
     order_elements = generate_order(7)
-    random_order = ExpressOrder(customer_first_name="Mateusz", customer_last_name="Tokarski",
-                                order_elements=order_elements, discount_policy=discount_holiday, delivery_term="12-10-2024")
+    default_policy = DiscountPolicy()
+    percentage_policy = PercentageDiscount(0.95)
+    absolute_policy = AbsoluteDiscount(20)
+
+    random_order_0 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                           order_elements=order_elements)
+    random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                         order_elements=order_elements, discount_policy=default_policy)
+    random_order_1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                           order_elements=order_elements, discount_policy=percentage_policy)
+    random_order_2 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                           order_elements=order_elements, discount_policy=absolute_policy)
+    random_order_term = ExpressOrder(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                                     order_elements=order_elements, discount_policy=absolute_policy)
+    print(random_order_0)
     print(random_order)
+    print(random_order_1)
+    print(random_order_2)
+    print(random_order_term)
 
 
 if __name__ == "__main__":
@@ -24,7 +39,7 @@ pliki ( __init__.py, order.py, discount_policy.py, order_element.py, data_genera
 
 plik: order.py
 
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.order_element import OrderElement
+from a3_5_abstrakcja_i_polimorfizm.shop.order_element import OrderElement
 
 
 class Order:
@@ -41,6 +56,7 @@ class Order:
         if len(order_elements) > Order.MAX_ELEMENT_ORDER:
             print("Note! Some units have been cut out - To much elements of this order.")
             order_elements = order_elements[:Order.MAX_ELEMENT_ORDER]
+        self.total_price_origin = 0
         self._order_elements = order_elements
         self.discount_policy = discount_policy
         self.total_price_n, self.discount = self.total_price
@@ -53,7 +69,9 @@ class Order:
             element_print += str(element)
 
         return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
-                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}\nDiscount: {self.discount}\: {self.total_price_n}')
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}'
+                f'\nDiscount: {self.discount}\nTotal price: {self.total_price_n}'
+                f'\nTotal price origin: {self.total_price_origin}')
 
     def __len__(self):
         return len(self._order_elements)
@@ -95,9 +113,12 @@ class Order:
             total_price += element.total_price_f()
 
         if self.discount_policy:
-            return self.discount_policy(total_price)
+            self.total_price_origin = total_price
+            # Zad 1
+            return self.discount_policy.apply_discount(total_price=total_price)
         else:
-            return total_price, "None"
+            self.total_price_origin = total_price
+            return total_price, "Default"
 
     def add_new_art(self, product_info, quantity_ord):
 
@@ -109,7 +130,6 @@ class Order:
             print("Note! Can't create new item, to much elements of this order.")
 
 
-# Zad 1
 class ExpressOrder(Order):
 
     DELIVERY_TAX = 5
@@ -127,7 +147,8 @@ class ExpressOrder(Order):
 
         if self.discount_policy:
             self.total_price_origin = total_price
-            return self.discount_policy(total_price + self.DELIVERY_TAX)
+            # Zad 1
+            return self.discount_policy.apply_discount(total_price=total_price+self.DELIVERY_TAX)
         else:
             self.total_price_origin = total_price
             return total_price, "None"
@@ -142,8 +163,6 @@ class ExpressOrder(Order):
                 f'\nTotal Price Origin: {self.total_price_origin}'
                 f'\nTotal Price ++(increased by {self.DELIVERY_TAX}): {self.total_price_n}'
                 f'\nDelivery Term: {self.delivery_term}')
-
-
 
 
 plik: product.py
@@ -183,28 +202,34 @@ class ProductTerm(Product):
 
 plik: discount_policy.py
 
-def default_policy(total_price):
-    return total_price, "none"
+# Zad 1
+class DiscountPolicy:
 
-
-def discount_all_item(total_price):
-
-    return total_price * 0.95, "loyal"
-
-
-def discount_holiday(total_price):
-
-    if total_price > 500:
-        return total_price - 20, "holiday"
-    else:
+    def apply_discount(self, total_price):
         return total_price, "none"
 
 
+class PercentageDiscount(DiscountPolicy):
+    def __init__(self, percent_discount):
+        self.percent_discount = percent_discount
+
+    def apply_discount(self, total_price):
+        return total_price*self.percent_discount, "loyal"
+
+
+class AbsoluteDiscount(DiscountPolicy):
+    def __init__(self, decrease_value):
+        self.decrease_value = decrease_value
+
+    def apply_discount(self, total_price):
+        if total_price > 500:
+            return total_price-self.decrease_value, "holiday"
+        else:
+            return total_price, "none"
 
 plik: order_element.py
 
-
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.tax_calculator import TaxCalculator
+from a3_5_abstrakcja_i_polimorfizm.shop.tax_calculator import TaxCalculator
 
 
 class OrderElement:
@@ -225,13 +250,12 @@ class OrderElement:
         return self.product_info.unit_price * self.quantity_ord
 
 
-
 plik: data_generator.py
 
 import random
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.order_element import OrderElement
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.product import Product
-from a3_4_nadpisanie_metody_w_klasie_potomnej.shop.order import Order
+from a3_5_abstrakcja_i_polimorfizm.shop.order_element import OrderElement
+from a3_5_abstrakcja_i_polimorfizm.shop.product import Product
+from a3_5_abstrakcja_i_polimorfizm.shop.order import Order
 
 
 UNIT_PRICE_MIN = 1
@@ -265,7 +289,6 @@ def generate_order(max_element=None):
 
 plik: apple.py
 
-
 class Apple:
     def __init__(self, species, size, price):
         self.species = species
@@ -296,8 +319,8 @@ class Potato:
         self.total_price = weight * self.price
 
 
-
 tax_calculator.py:
+
 
 class TaxCalculator:
     @staticmethod
@@ -308,3 +331,5 @@ class TaxCalculator:
             return round(total_price * 0.08, 2)
         else:
             return round(total_price * 0.20, 2)
+
+
