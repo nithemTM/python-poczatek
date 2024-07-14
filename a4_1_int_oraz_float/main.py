@@ -1,0 +1,24 @@
+import math
+import random
+
+float_list = []
+int_list = []
+
+for x in range(0,6):
+    random_float = random.uniform(-20, 20)
+    float_list.append(random_float)
+    if x < 3:
+        random_int = random.randint(1, 10)
+        int_list.append(random_int)
+
+print(f"Wylosowane liczby typu float: {float_list}")
+print(f"Wylosowane liczby typu int: {int_list}")
+
+
+print(f"Zaokrąglenie Round: {round(float_list[0])}")
+print(f"Zaokrąglenie Ceil: {math.ceil(float_list[1])}")
+print(f"Zaokrąglenie Floor: {math.floor(float_list[2])}")
+
+for x in range(0,3):
+    print(f"Potega {int_list[x]} liczby {float_list[3+x]}: {pow(float_list[3+x],int_list[x])}")
+
