@@ -1,0 +1,39 @@
+
+#ZADANIE 1
+
+Plik: main.py
+
+import random
+
+
+def add_random_number_set(set_number):
+    set_number.add(random.randint(0, 10))
+
+
+def add_random_number_frozenset(frozenset_number):
+    return frozenset_number.union({random.randint(0, 10)})
+
+
+def call_object():
+
+    # Zad 1 - przed uruchomieniem zahaszuj albo number = set() albo number = frozenset()
+    number = set()
+    number = frozenset()
+    results_ = []
+
+    while len(number) < 11:
+        results_.append(number)
+        number = add_random_number_frozenset(number)
+        results_.append(number)
+        number = add_random_number_frozenset(number)
+
+    print(f"Set : {results_}")
+
+
+if __name__ == "__main__":
+    call_object()
+
+
+
+
+
