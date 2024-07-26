@@ -1,0 +1,261 @@
+
+#ZADANIE 1
+Plik: main.py
+
+
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.order import Order
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.product import Product
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.apple import Apple
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.potato import Potato
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.order_element import OrderElement
+
+
+def call_object():
+
+    auto = Product(name="Honda Accord", category_name="Cars", unit_price=120000)
+    circular_saw = Product(name="Bosh Circular X100", category_name="Saw", unit_price=1000)
+
+    print(auto)
+    print(circular_saw)
+
+    product_1 = OrderElement(product_info=auto,quantity_ord=2)
+    product_2 = OrderElement(product_info=circular_saw,quantity_ord=9)
+    product_list = [product_1, product_2]
+    product_list_1 = [product_1, product_1]
+    order_1 = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", order_elements=product_list)
+
+    print(order_1)
+    print(f"Number of order items: {len(order_1)}")
+
+    Order.generate_order(5)
+
+    apple = Apple("Special", 2, 3)
+    potato = Potato("Lord",1,4)
+    print(apple)
+    print(potato)
+
+    auto2 = Product(name="Honda Accord", category_name="Cars", unit_price=120000)
+    circular_saw2 = Product(name="Bosh Circular X101", category_name="Saw", unit_price=1000)
+
+    print(f"auto = {auto}")
+    print(f"auto2 = {auto2}")
+    print(f"circular_saw = {circular_saw}")
+    print(f"circular_saw2 = {circular_saw2}")
+    print(f"Czy auto == auto2? {auto == auto2}")
+    print(f"Czy circular_saw == circular_saw2? {circular_saw == circular_saw2}")
+
+    # Zad 1
+    print(f'Stare zamówienie: {order_1}')
+    print("Dodanie nowego art do zamówienia")
+    order_1.add_new_art(product_info=circular_saw2, quantity_ord=5)
+    print(f'Nowe zamówienie: {order_1}')
+
+
+
+if __name__ == "__main__":
+    call_object()
+
+
+
+Pakiet: shop
+pliki ( __init__.py, order.py, order_element.py product.py, apple.py, potato.py, tax_calculator.py)
+
+plik: order.py
+
+import random
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.product import Product
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.order_element import OrderElement
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.tax_calculator import TaxCalculator
+
+
+class Order:
+    # Zad 1
+    MAX_ELEMENT_ORDER = 2
+
+    def __init__(self, customer_first_name, customer_last_name, order_elements=None):
+        self.customer_first_name = customer_first_name
+        self.customer_last_name = customer_last_name
+
+        if order_elements is None:
+            order_elements = []
+        # Zad 1
+        if len(order_elements) > Order.MAX_ELEMENT_ORDER:
+            print("Note! Some units have been cut out - To much elements of this order.")
+            order_elements = order_elements[:Order.MAX_ELEMENT_ORDER]
+        self._order_elements = order_elements
+        self.total_price = self._total_price_f()
+
+    def __str__(self):
+        element_print = ""
+        for element in self._order_elements:
+            element_print += "\n"
+            element_print += str(element)
+
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}')
+
+    def __len__(self):
+        return len(self._order_elements)
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+
+        if len(self._order_elements) != len(other.order_elements):
+            return False
+
+        if self.customer_first_name != other.customer_first_name or self.customer_last_name != other.customer_last_name:
+            return False
+
+        for element in self._order_elements:
+            if element not in other.order_elements:
+                return False
+        return True
+
+    # Zad 1
+    def _total_price_f(self):
+        total_price = 0
+        for element in self._order_elements:
+            total_price += element.total_price_f()
+
+        return total_price
+
+    # Zad 1
+    def add_new_art(self, product_info, quantity_ord):
+        # Zad 1
+        if len(self._order_elements) < Order.MAX_ELEMENT_ORDER:
+            new_element = OrderElement(product_info, quantity_ord)
+            self._order_elements.append(new_element)
+            self.total_price = self._total_price_f()
+        else:
+            print("Note! Can't create new item, to much elements of this order.")
+
+    # Zad 2
+    @classmethod
+    def generate_order(cls, max_element):  # Zad 1
+
+        a = random.randint(max_element+1, max_element+13)
+        order_elements = []
+        b = random.sample(range(1, a + 1), max_element)
+        for i, prod in enumerate(b):
+            # Zad 3
+            if i % 2 == 0:
+                category = "Owoce i warzywa"
+            elif i % 3 == 0:
+                category = "Jedzenie"
+            else:
+                category = f"Some category-{prod}"
+            product = Product(name=f"Product-{str(prod)}", category_name=category,
+                              unit_price=random.randint(1, 50))
+
+            element = OrderElement(product_info=product, quantity_ord=random.randint(1, 10))
+            order_elements.append(element)
+
+        random_order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski",
+                             order_elements=order_elements)
+        print(random_order)
+        print(f"Number of order items: {len(random_order)}")
+
+
+
+
+plik: product.py
+
+class Product:
+    def __init__(self, name, category_name, unit_price):
+        self.name = name
+        self.category_name = category_name
+        self.unit_price = int(unit_price)
+
+    def __str__(self):
+        return f'Name: {self.name} - Category: {self.category_name} - Unit Price: {self.unit_price}'
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+        return (
+                self.name == other.name
+                and self.category_name == other.category_name
+                and self.unit_price == other.unit_price
+        )
+
+
+
+
+plik: order_element.py
+
+from sekcja_2_prog_obiektowe_1.a2_5_metody_i_pola_klasy_oraz_metody_statyczne.shop.tax_calculator import TaxCalculator
+
+
+class OrderElement:
+    def __init__(self, product_info, quantity_ord):
+        self.product_info = product_info
+        self.quantity_ord = quantity_ord
+        # Zad 3
+        self.tax = TaxCalculator.calculate_tax(self.total_price_f(), self.product_info.category_name)
+
+    def __str__(self):
+        return f'{self.product_info}\n\t\t x {self.quantity_ord}  Tax: {self.tax}'
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+        return self.product_info == other.product_info and self.quantity_ord == other.quantity_ord
+
+    def total_price_f(self):
+        return self.product_info.unit_price * self.quantity_ord
+
+
+
+
+
+
+plik: apple.py
+
+
+class Apple:
+    def __init__(self, species, size, price):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    def __repr__(self):
+        return f"APPLE data: [Species - {self.species}, Size - {self.size}, Price - {self.price}, Total Price - {self.total_price}]"
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+plik: potato.py
+
+
+class Potato:
+    def __init__(self, species="Lord", size=1, price=0):
+        self.species = species
+        self.size = size
+        self.price = price
+        self.total_price = 0
+
+    def __repr__(self):
+        return f"POTATO data: [Species - {self.species}, Size - {self.size}, Price - {self.price}, Total Price - {self.total_price}]"
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+plik: tax_calculator.py
+
+
+class TaxCalculator:
+    @staticmethod
+    def calculate_tax(total_price, category_name):
+        if category_name == "Owoce i warzywa":
+            return round(total_price * 0.05, 2)
+        elif category_name == "Jedzenie":
+            return round(total_price * 0.08, 2)
+        else:
+            return round(total_price * 0.20, 2)
+

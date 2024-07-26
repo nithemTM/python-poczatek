@@ -1,0 +1,313 @@
+
+# ZADANIE 1
+
+Plik: main.py
+
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.data_generator import generate_order
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.order import Order
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.discount_policy import DiscountPolicy
+
+
+def call_object():
+    # Zad 1
+    policy = DiscountPolicy()
+    order_random = generate_order(7)
+    order = Order(customer_first_name="Mateusz", customer_last_name="Tokarski", discount_policy=policy, order_elements=order_random)
+    print(order)
+
+
+if __name__ == "__main__":
+    call_object()
+
+Pakiet: shop
+pliki ( __init__.py, order.py, discount_policy.py, order_element.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
+
+plik: order.py
+
+from a4_10_enum.shop.order_element import OrderElement
+
+
+class Order:
+
+    MAX_ELEMENT_ORDER = 10
+
+    def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None):
+        self.customer_first_name = customer_first_name
+        self.customer_last_name = customer_last_name
+
+        if order_elements is None:
+            order_elements = []
+
+        if len(order_elements) > Order.MAX_ELEMENT_ORDER:
+            print("Note! Some units have been cut out - To much elements of this order.")
+            order_elements = order_elements[:Order.MAX_ELEMENT_ORDER]
+        self.total_price_origin = 0
+        self._order_elements = order_elements
+        self.discount_policy = discount_policy
+        self.total_price_n, self.discount = self.total_price
+        # self.total_price, self.discount = self._total_price_f()
+
+    def __str__(self):
+        element_print = ""
+        for element in self._order_elements:
+            element_print += "\n"
+            element_print += str(element)
+
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}'
+                f'\nDiscount: {self.discount}\nTotal price: {self.total_price_n}'
+                f'\nTotal price origin: {self.total_price_origin}')
+
+    def __len__(self):
+        return len(self._order_elements)
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+
+        if len(self._order_elements) != len(other.order_elements):
+            return False
+
+        if self.customer_first_name != other.customer_first_name or self.customer_last_name != other.customer_last_name:
+            return False
+
+        for element in self._order_elements:
+            if element not in other.order_elements:
+                return False
+        return True
+
+    @property
+    def order_elements(self):
+        return self._order_elements
+
+    @order_elements.setter
+    def order_elements(self, value):
+        if len(value) < Order.MAX_ELEMENT_ORDER:
+            self._order_elements = value
+        else:
+            self._order_elements = value[:Order.MAX_ELEMENT_ORDER]
+        # self.total_price, self.discount = self._total_price_f()
+
+    @property
+    def total_price(self):
+        return self._total_price_f()
+
+    def _total_price_f(self):
+        total_price = 0
+        for element in self._order_elements:
+            total_price += element.total_price_f()
+
+        if self.discount_policy:
+            self.total_price_origin = total_price
+
+            return self.discount_policy.apply_discount(total_price=total_price)
+        else:
+            self.total_price_origin = total_price
+            return total_price, "Default"
+
+    def add_new_art(self, product_info, quantity_ord):
+
+        if len(self._order_elements) < Order.MAX_ELEMENT_ORDER:
+            new_element = OrderElement(product_info, quantity_ord)
+            self._order_elements.append(new_element)
+            # self.total_price = self._total_price_f()
+        else:
+            print("Note! Can't create new item, to much elements of this order.")
+
+
+class ExpressOrder(Order):
+
+    DELIVERY_TAX = 5
+
+    def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None, delivery_term="01-01-1900"):
+        super().__init__(customer_first_name, customer_last_name, discount_policy, order_elements)
+        self.delivery_term = delivery_term
+        self.total_price_origin = 0
+        #self.total_price_n = self.total_price_n + self.DELIVERY_TAX
+
+    # Zad 1
+    def _total_price_f(self):
+        total_price_n, discount = super()._total_price_f()
+        return total_price_n+self.DELIVERY_TAX, discount
+
+    def __str__(self):
+        element_print = ""
+        for element in self._order_elements:
+            element_print += "\n"
+            element_print += str(element)
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}\nDiscount: {self.discount}'
+                f'\nTotal Price Origin: {self.total_price_origin}'
+                f'\nTotal Price ++(increased by {self.DELIVERY_TAX}): {self.total_price_n}'
+                f'\nDelivery Term: {self.delivery_term}')
+
+
+
+plik: product.py
+
+# Zad 1
+from dataclasses import dataclass
+from enum import Enum
+
+
+class ProductCategory(Enum):
+    FOOD = "Jedzenie"
+    VEGE = "Owoce i warzywa"
+    OTHER = "Some category"
+
+
+@dataclass
+class Product:
+    name: str
+    category_name: ProductCategory
+    unit_price: int
+
+    def __str__(self):
+        return f'Name: {self.name} - Category: {self.category_name.value} - Unit Price: {self.unit_price}'
+
+
+@dataclass
+class ProductTerm(Product):
+    year_production: int
+    amount_years: int
+
+    def does_expire(self, current_year):
+        if (current_year - self.year_production) > self.amount_years:
+            return True
+        else:
+            return False
+
+
+
+plik: discount_policy.py
+
+class DiscountPolicy:
+
+    def apply_discount(self, total_price):
+        return total_price, "none"
+
+
+class PercentageDiscount(DiscountPolicy):
+    def __init__(self, percent_discount):
+        self.percent_discount = percent_discount
+
+    def apply_discount(self, total_price):
+        return total_price*self.percent_discount, "loyal"
+
+
+class AbsoluteDiscount(DiscountPolicy):
+    def __init__(self, decrease_value):
+        self.decrease_value = decrease_value
+
+    def apply_discount(self, total_price):
+        if total_price > 500:
+            return total_price-self.decrease_value, "holiday"
+        else:
+            return total_price, "none"
+
+plik: order_element.py
+
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.product import Product
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.tax_calculator import TaxCalculator
+from dataclasses import dataclass, field
+
+
+@dataclass
+class OrderElement:
+    product_info: Product
+    quantity_ord: int
+    tax: float = field(init=False)
+
+    def __post_init__(self):
+        self.tax = TaxCalculator.calculate_tax(self.total_price_f(), self.product_info.category_name)
+
+    def __str__(self):
+        return f'{self.product_info}\n\t\t x {self.quantity_ord}\n\t\t [Total price: {self.total_price_f()} - Tax: {self.tax}]'
+
+    def total_price_f(self):
+        return self.product_info.unit_price * self.quantity_ord
+
+
+plik: data_generator.py
+
+import random
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.order_element import OrderElement
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.product import Product, ProductCategory
+from sekcja_4_wbudowane_struktury_danych.a4_10_enum.shop.order import Order
+
+
+UNIT_PRICE_MIN = 1
+UNIT_PRICE_MAX = 50
+QUANTITY_MIN = 1
+QUANTITY_MAX = 10
+
+
+def generate_order(max_element=None):
+
+    if max_element is None:
+        max_element = random.randint(1, Order.MAX_ELEMENT_ORDER)
+    order_elements = []
+    element_sample = random.sample(range(1, max_element + 20), max_element)
+    for i, prod in enumerate(element_sample):
+        # Zad 1
+        if i % 2 == 0:
+            category = ProductCategory.VEGE
+        elif i % 3 == 0:
+            category = ProductCategory.FOOD
+        else:
+            category = ProductCategory.OTHER
+        product = Product(name=f"Product-{str(prod)}", category_name=category,
+                          unit_price=random.randint(UNIT_PRICE_MIN, UNIT_PRICE_MAX))
+
+        element = OrderElement(product_info=product, quantity_ord=random.randint(QUANTITY_MIN, QUANTITY_MAX))
+        order_elements.append(element)
+
+    return order_elements
+
+
+plik: apple.py
+
+# Zad 1
+from dataclasses import dataclass
+
+
+@dataclass
+class Apple:
+    species: str = "Gold"
+    size: int = 2
+    price: int = 0
+    total_price: int = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+plik: potato.py
+
+# Zad 1
+from dataclasses import dataclass
+
+
+@dataclass
+class Potato:
+    species: str = "Lord"
+    size: int = 1
+    price: int = 0
+    total_price: int = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+tax_calculator.py:
+
+class TaxCalculator:
+    @staticmethod
+    def calculate_tax(total_price, category_name):
+        if category_name == "Owoce i warzywa":
+            return round(total_price * 0.05, 2)
+        elif category_name == "Jedzenie":
+            return round(total_price * 0.08, 2)
+        else:
+            return round(total_price * 0.20, 2)
