@@ -1,0 +1,22 @@
+# Zad 1
+def call_object():
+
+    litery_imienia = input("Podaj pierwsze trzy litery imienia: ")
+
+    if len(litery_imienia) > 3:
+        raise Exception("Zbyt dużo liter!")
+    if len(litery_imienia) < 3:
+        raise Exception("Zbyt mało liter!")
+    return litery_imienia
+
+
+if __name__ == "__main__":
+    try:
+        letter = call_object()
+    except Exception as error:
+        print(f"Bład!"
+              f"Szczegóły: {error}")
+    else:
+        print(f"user podał 3 znaki {letter}")
+    finally:
+        print("zawsze wypisujemy na zakonczenie")
