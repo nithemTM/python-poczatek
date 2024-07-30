@@ -1,0 +1,24 @@
+[ Show order ]
+Customer Data: dsa ds
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 81
+		 x 3
+		 [Total price: 243 - Tax: 48.6]
+Total cost of order: (243, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 243
+
+
+[ Show order ]
+Customer Data: dfe dwq
+Items of Order: 
+Name: Rower - Category: Some category - Unit Price: 41
+		 x 1
+		 [Total price: 41 - Tax: 8.2]
+Total cost of order: (41, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 41
+
+
