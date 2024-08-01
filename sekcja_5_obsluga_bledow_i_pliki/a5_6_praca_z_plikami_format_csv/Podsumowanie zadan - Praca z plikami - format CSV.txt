@@ -1,27 +1,42 @@
 
-# ZADANIE 1 - 2
+# ZADANIE 1 - 3
 
 Plik: main.py
 
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.user_interface import handle_customer
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.user_interface import handle_customer
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.store import Store
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.file_action import reader_store, writer_store, dict_reader_store, dict_writer_store
 
 
 def call_object():
 
+    # Zad 1
+    Store.AVAILABLE_PRODUCTS = reader_store()
     handle_customer()
+
+    # Zad 2
+    writer_store(Store.AVAILABLE_PRODUCTS)
+
+    # Zad 3
+    Store.AVAILABLE_PRODUCTS = dict_reader_store()
+    handle_customer()
+    dict_writer_store(Store.AVAILABLE_PRODUCTS)
 
 
 if __name__ == "__main__":
     call_object()
 
+Folder z plikami zapisu: data
+pliki (orders.txt, werhouse.csv)
+
 Pakiet: shop
-pliki ( __init__.py, order.py, user_interface.py, store.py, discount_policy.py, order_element.py, file_action.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
+pliki ( __init__.py, order.py, discount_policy.py, store.py, user_interface.py, order_element.py, file_action.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
 
 plik: order.py
 
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.order_element import OrderElement
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.error_expectation import MaxLimitExpectation
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.store import Store
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.order_element import OrderElement
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.error_expectation import MaxLimitExpectation
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.store import Store
 
 
 class Order:
@@ -150,23 +165,21 @@ class ExpressOrder(Order):
 
 plik: user_interface.py
 
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.order import Order
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.store import Store
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.file_action import save_order, see_history, choose_action
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.order import Order
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.store import Store
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.file_action import save_order, see_history, choose_action
 
 
 def handle_customer():
     say_hello()
     select = choose_action()
     print(select)
-    # Zad 2
     if select == 1:
         order = init_order()
         while want_more_products():
             add_product_to_order(order, Store.AVAILABLE_PRODUCTS)
         print_order_summary(order)
-        # Zad 1
         save_order(order)
     elif select == 2:
         orders = see_history()
@@ -204,7 +217,7 @@ def add_product_to_order(order, available_products):
         quantity_str = input("Podaj liczbę sztuk: ")
         quantity = parse_quantity(quantity_str)
     except NotValidInput as input_error:
-        # Zad 3
+
         print(f"Input error!"
               f"Details: {input_error}")
         return
@@ -218,7 +231,7 @@ def add_product_to_order(order, available_products):
 
 
 def parse_product_index(product_index_str, max_index):
-    # Zad 3
+
     if product_index_str.isnumeric():
         product_index_str = int(product_index_str)
         if 0 <= product_index_str <= max_index:
@@ -232,7 +245,7 @@ def parse_product_index(product_index_str, max_index):
 
 
 def parse_quantity(quantity_str):
-    # Zad 3
+
     if quantity_str.isnumeric():
         quantity_str = int(quantity_str)
         if quantity_str <= 0:
@@ -251,8 +264,8 @@ plik: store.py
 
 import random
 
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.product import Product, ProductCategory
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.product import Product, ProductCategory
 
 
 class AvailableProduct:
@@ -356,8 +369,8 @@ class AbsoluteDiscount(DiscountPolicy):
 
 plik: order_element.py
 
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.product import Product
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.tax_calculator import TaxCalculator
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.product import Product
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.tax_calculator import TaxCalculator
 from dataclasses import dataclass, field
 
 
@@ -379,10 +392,83 @@ class OrderElement:
 
 plik: file_action.py
 
+import csv
 import os
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.store import AvailableProduct
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.product import ProductCategory
+
+
+# Zad 1
+def reader_store():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    store_available = []
+    with open(path_file, newline="") as available_store:
+        csv_reader = csv.reader(available_store)
+        print(csv_reader)
+        next(csv_reader)
+        for row_index, row in enumerate(csv_reader):
+            print(row[0])
+            product = AvailableProduct(quantity=int(row[4]), name=row[0], category=ProductCategory[row[1]], unit_price=int(row[2]), identifier=int(row[3]))
+            store_available.append(product)
+
+    return store_available
 
 
 # Zad 2
+def writer_store(currenty_store):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    with open(path_file, mode="w", newline="") as available_store_write:
+        csv_writer = csv.writer(available_store_write)
+        csv_writer.writerow(["name","category_name","unit_price","identifier","quantity"])
+        for product_next in currenty_store:
+            csv_writer.writerow(
+                [
+                    product_next.product.name,
+                    product_next.product.category_name.name,
+                    product_next.product.unit_price,
+                    product_next.product.identifier,
+                    product_next.quantity
+                ]
+            )
+
+
+# Zad 3
+def dict_reader_store():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    store_available = []
+    with open(path_file, newline="") as available_store:
+        csv_reader = csv.DictReader(available_store)
+        for row_index, row in enumerate(csv_reader):
+            print(row["name"])
+            product = AvailableProduct(quantity=int(row["quantity"]), name=row["name"], category=ProductCategory[row["category_name"]], unit_price=int(row["unit_price"]), identifier=int(row["identifier"]))
+            store_available.append(product)
+
+    return store_available
+
+
+def dict_writer_store(currenty_store):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    with open(path_file, mode="w", newline="") as available_store_write:
+        header = ["name","category_name","unit_price","identifier","quantity"]
+
+        csv_writer = csv.DictWriter(available_store_write, fieldnames=header)
+        csv_writer.writeheader()
+        for product_next in currenty_store:
+            csv_writer.writerow(
+                {
+                    "name": product_next.product.name,
+                    "category_name": product_next.product.category_name.name,
+                    "unit_price": product_next.product.unit_price,
+                    "identifier": product_next.product.identifier,
+                    "quantity": product_next.quantity,
+                }
+            )
+
+
 def choose_action():
     try:
         a = int(input("1 - New Order\n"
@@ -408,7 +494,6 @@ def see_history():
         print("Zamykamy plik")
         orders_txt.close()
 
-# Zad 1
 
 def save_order(order):
     c_dir = os.path.dirname(__file__)
@@ -429,9 +514,9 @@ def save_order(order):
 plik: data_generator.py
 
 import random
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.order_element import OrderElement
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.product import Product, ProductCategory
-from sekcja_5_obsluga_bledow_i_pliki.a5_5_praca_z_plikami_konstrukcja_with.shop.order import Order
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.order_element import OrderElement
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.product import Product, ProductCategory
+from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.order import Order
 
 
 UNIT_PRICE_MIN = 1
