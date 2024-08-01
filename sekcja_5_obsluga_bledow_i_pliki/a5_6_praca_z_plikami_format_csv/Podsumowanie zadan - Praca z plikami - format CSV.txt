@@ -8,6 +8,7 @@ from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.store 
 from sekcja_5_obsluga_bledow_i_pliki.a5_6_praca_z_plikami_format_csv.shop.file_action import reader_store, writer_store, dict_reader_store, dict_writer_store
 
 
+
 def call_object():
 
     # Zad 1
