@@ -1,0 +1,157 @@
+[ Show order ]
+Customer Data: dsa ds
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 81
+		 x 3
+		 [Total price: 243 - Tax: 48.6]
+Total cost of order: (243, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 243
+
+
+[ Show order ]
+Customer Data: dfe dwq
+Items of Order: 
+Name: Rower - Category: Some category - Unit Price: 41
+		 x 1
+		 [Total price: 41 - Tax: 8.2]
+Total cost of order: (41, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 41
+
+
+[ Show order ]
+Customer Data: fe sf
+Items of Order: 
+Total cost of order: (0, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 0
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 3
+		 [Total price: 15 - Tax: 3.0]
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 3
+		 [Total price: 15 - Tax: 3.0]
+Total cost of order: (30, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 30
+
+
+2[ Show order ]
+Customer Data: fef dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 5
+		 [Total price: 25 - Tax: 5.0]
+Total cost of order: (25, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 25
+
+
+2[ Show order ]
+Customer Data: dsadsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 5
+		 [Total price: 25 - Tax: 5.0]
+Total cost of order: (25, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 25
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 3
+		 [Total price: 15 - Tax: 3.0]
+Total cost of order: (15, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 15
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Rower - Category: Some category - Unit Price: 500
+		 x 1
+		 [Total price: 500 - Tax: 100.0]
+Total cost of order: (500, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 500
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 1
+		 [Total price: 5 - Tax: 1.0]
+Total cost of order: (5, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 5
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 1
+		 [Total price: 5 - Tax: 1.0]
+Total cost of order: (5, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 5
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 5
+		 [Total price: 25 - Tax: 5.0]
+Total cost of order: (25, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 25
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Chleb - Category: Jedzenie - Unit Price: 5
+		 x 5
+		 [Total price: 25 - Tax: 5.0]
+Total cost of order: (25, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 25
+
+
+2[ Show order ]
+Customer Data: dsa dsa
+Items of Order: 
+Name: Mlotek - Category: Narzêdzia - Unit Price: 30
+		 x 1
+		 [Total price: 30 - Tax: 6.0]
+Total cost of order: (30, 'Default')
+Discount: Default
+Total price: 0
+Total price origin: 30
+
+
+2

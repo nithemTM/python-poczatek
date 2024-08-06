@@ -1,0 +1,73 @@
+{
+    "orders": [
+        {
+            "customer_first_name": "Mateusz",
+            "customer_last_name": "Tokarski",
+            "order_elements": [
+                {
+                    "product_name": "Mlotek",
+                    "category_name": "Narz\u0119dzia",
+                    "unit_price": 30,
+                    "quantity": 1,
+                    "tax": 6.0,
+                    "payment": 30
+                },
+                {
+                    "product_name": "Chleb",
+                    "category_name": "Jedzenie",
+                    "unit_price": 5,
+                    "quantity": 2,
+                    "tax": 2.0,
+                    "payment": 10
+                },
+                {
+                    "product_name": "Rower",
+                    "category_name": "Some category",
+                    "unit_price": 500,
+                    "quantity": 1,
+                    "tax": 100.0,
+                    "payment": 500
+                }
+            ],
+            "total_price": 540
+        },
+        {
+            "customer_first_name": "Mat",
+            "customer_last_name": "Toka",
+            "order_elements": [
+                {
+                    "product_name": "Kosiarka",
+                    "category_name": "Narz\u0119dzia",
+                    "unit_price": 300,
+                    "quantity": 2,
+                    "tax": 120.0,
+                    "payment": 600
+                },
+                {
+                    "product_name": "Rower",
+                    "category_name": "Some category",
+                    "unit_price": 500,
+                    "quantity": 1,
+                    "tax": 100.0,
+                    "payment": 500
+                }
+            ],
+            "total_price": 1100
+        },
+        {
+            "customer_first_name": "Mateusz",
+            "customer_last_name": "Tokarski",
+            "order_elements": [
+                {
+                    "product_name": "Mlotek",
+                    "category_name": "Narz\u0119dzia",
+                    "unit_price": 30,
+                    "quantity": 1,
+                    "tax": 6.0,
+                    "payment": 30
+                }
+            ],
+            "total_price": 30
+        }
+    ]
+}

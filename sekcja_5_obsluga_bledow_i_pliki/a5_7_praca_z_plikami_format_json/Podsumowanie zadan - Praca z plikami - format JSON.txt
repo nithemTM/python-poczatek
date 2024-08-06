@@ -1,0 +1,661 @@
+
+# ZADANIE 1 - 2
+
+Plik: main.py
+
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.user_interface import handle_customer
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.store import Store
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.file_action import reader_store, writer_store, dict_reader_store, dict_writer_store
+
+
+def call_object():
+
+    Store.AVAILABLE_PRODUCTS = dict_reader_store()
+    handle_customer()
+    dict_writer_store(Store.AVAILABLE_PRODUCTS)
+
+
+if __name__ == "__main__":
+    call_object()
+
+Folder z plikami zapisu: data
+pliki (orders.txt, werhouse.csv, orders.txt)
+
+Pakiet: shop
+pliki ( __init__.py, order.py, discount_policy.py, store.py, user_interface.py, order_element.py, file_action.py, data_generator.py, product.py, apple.py, potato.py, tax_calculator.py)
+
+plik: order.py
+
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.order_element import OrderElement
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.error_expectation import MaxLimitExpectation
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.store import Store
+
+
+class Order:
+
+    MAX_ELEMENT_ORDER = 10
+
+    def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None):
+        self.customer_first_name = customer_first_name
+        self.customer_last_name = customer_last_name
+
+        if order_elements is None:
+            order_elements = []
+
+        if len(order_elements) > Order.MAX_ELEMENT_ORDER:
+            raise MaxLimitExpectation(
+                allowed_limit=self.MAX_ELEMENT_ORDER
+            )
+
+        self.total_price_origin = 0
+        self._order_elements = order_elements
+        self.discount_policy = discount_policy
+        self.total_price_n, self.discount = self.total_price
+
+    def __str__(self):
+        element_print = ""
+        for element in self._order_elements:
+            element_print += "\n"
+            element_print += str(element)
+
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}'
+                f'\nDiscount: {self.discount}\nTotal price: {self.total_price_n}'
+                f'\nTotal price origin: {self.total_price_origin}')
+
+    def __len__(self):
+        return len(self._order_elements)
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return NotImplemented
+
+        if len(self._order_elements) != len(other.order_elements):
+            return False
+
+        if self.customer_first_name != other.customer_first_name or self.customer_last_name != other.customer_last_name:
+            return False
+
+        for element in self._order_elements:
+            if element not in other.order_elements:
+                return False
+        return True
+
+    @property
+    def order_elements(self):
+        return self._order_elements
+
+    @order_elements.setter
+    def order_elements(self, value):
+        if len(value) <= Order.MAX_ELEMENT_ORDER:
+            self._order_elements = value
+        else:
+            raise MaxLimitExpectation(
+                allowed_limit=self.MAX_ELEMENT_ORDER,
+                message=f"Przekroczona liczba elementów w zamówieniu, czyli {self.MAX_ELEMENT_ORDER} po użyciu settera!"
+            )
+            #self._order_elements = value[:Order.MAX_ELEMENT_ORDER]
+        # self.total_price, self.discount = self._total_price_f()
+
+    @property
+    def total_price(self):
+        return self._total_price_f()
+
+    def _total_price_f(self):
+        total_price = 0
+        for element in self._order_elements:
+            total_price += element.total_price_f()
+
+        if self.discount_policy:
+            self.total_price_origin = total_price
+
+            return self.discount_policy.apply_discount(total_price=total_price)
+        else:
+            self.total_price_origin = total_price
+            return total_price, "Default"
+
+    def add_new_art(self, product_info, quantity_ord):
+
+        if len(self._order_elements) < Order.MAX_ELEMENT_ORDER:
+            Store.reserve_product(product_info, quantity_ord)
+            new_element = OrderElement(product_info, quantity_ord)
+            self._order_elements.append(new_element)
+            # self.total_price = self._total_price_f()
+        else:
+            raise MaxLimitExpectation(
+                allowed_limit=self.MAX_ELEMENT_ORDER,
+                message=f"Przekroczona liczba elementów w zamówieniu, czyli {self.MAX_ELEMENT_ORDER} po dodaniu nowego art! "
+                f"Wypisano tylko obecna listę zamówienia"
+            )
+            # print("Note! Can't create new item, to much elements of this order.")
+
+
+class ExpressOrder(Order):
+
+    DELIVERY_TAX = 5
+
+    def __init__(self, customer_first_name, customer_last_name, discount_policy=None, order_elements=None, delivery_term="01-01-1900"):
+        super().__init__(customer_first_name, customer_last_name, discount_policy, order_elements)
+        self.delivery_term = delivery_term
+        self.total_price_origin = 0
+
+    def _total_price_f(self):
+        total_price_n, discount = super()._total_price_f()
+        return total_price_n+self.DELIVERY_TAX, discount
+
+    def __str__(self):
+        element_print = ""
+        for element in self._order_elements:
+            element_print += "\n"
+            element_print += str(element)
+        return (f'[ Show order ]\nCustomer Data: {self.customer_first_name} {self.customer_last_name}\n'
+                f'Items of Order: {element_print}\nTotal cost of order: {self.total_price}\nDiscount: {self.discount}'
+                f'\nTotal Price Origin: {self.total_price_origin}'
+                f'\nTotal Price ++(increased by {self.DELIVERY_TAX}): {self.total_price_n}'
+                f'\nDelivery Term: {self.delivery_term}')
+
+
+
+plik: user_interface.py
+
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.order import Order
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.store import Store
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.file_action import save_order, see_history, choose_action, save_json, load_json, see_history_json
+
+
+def handle_customer():
+    say_hello()
+    select = choose_action()
+    print(select)
+    # ZAD 1
+    data = load_json()
+
+    if select == 1:
+        order = init_order()
+        while want_more_products():
+            add_product_to_order(order, Store.AVAILABLE_PRODUCTS)
+        print_order_summary(order)
+
+        save_json(order, data)
+    elif select == 2:
+
+        # ZAD 2
+        first_name = input("Imie:" )
+        last_name = input("Nazwisko:" )
+        orders = data
+        see_history_json(first_name, last_name, orders)
+
+
+def say_hello():
+    print("Witaj w naszym sklepie!")
+
+
+def init_order():
+    first_name = input("Imie: " )
+    last_name = input("Nazwisko: " )
+    order = Order(customer_first_name=first_name, customer_last_name=last_name)
+    return order
+
+
+def want_more_products():
+    selection = input("Czy chcesz dodać produkty do zamówienia? T/N: ")
+    if selection.upper() != "T" and selection.upper() != "N":
+        print("Opcje są tylko dwie - zakładam, że chcesz coś zamówić ;)")
+        return True
+    return selection.upper() == "T"
+
+
+def add_product_to_order(order, available_products):
+    print("Oto dostępne produkty:")
+    for index, available_product in enumerate(available_products):
+        print(f"{index}) {available_product.product}")
+
+    try:
+        product_index_str = input("Wybierz numer: ")
+        product_index = parse_product_index(product_index_str, max_index=len(available_products) - 1)
+
+        quantity_str = input("Podaj liczbę sztuk: ")
+        quantity = parse_quantity(quantity_str)
+    except NotValidInput as input_error:
+
+        print(f"Input error!"
+              f"Details: {input_error}")
+        return
+
+    try:
+        order.add_new_art(available_products[product_index].product, quantity)
+    except TemporaryOutOfStock as error:
+        print(f"Niestety mamy dostępne tylko {error.available_quantity} sztuk produktu {error.product_name}")
+    except ProductNotAvailable as error:
+        print(f"Produkt {error.product_name} nie jest dostępny. Wybierz inny.")
+
+
+def parse_product_index(product_index_str, max_index):
+
+    if product_index_str.isnumeric():
+        product_index_str = int(product_index_str)
+        if 0 <= product_index_str <= max_index:
+            print(f"inndex{max_index}")
+            print(f"inndex_{product_index_str}")
+        else:
+            raise NotValidInput("Out of index list!")
+        return product_index_str
+    else:
+        raise NotValidInput("Nieprawidłowy wpis!")
+
+
+def parse_quantity(quantity_str):
+
+    if quantity_str.isnumeric():
+        quantity_str = int(quantity_str)
+        if quantity_str <= 0:
+            raise NotValidInput("Zbyt mała wartość!")
+        return quantity_str
+    else:
+        raise NotValidInput("Nieprawidłowy wpis!")
+
+
+def print_order_summary(order):
+    print("Twoje zamówienie to:")
+    print(order)
+    print("Dziękujemy i zapraszamy ponownie!")
+
+
+plik: store.py
+
+import random
+
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.error_expectation import TemporaryOutOfStock, ProductNotAvailable, NotValidInput
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.product import Product, ProductCategory
+
+
+class AvailableProduct:
+
+    def __init__(self, quantity, name, category, unit_price=None, identifier=None):
+        if unit_price is None:
+            unit_price = random.randint(1, 100)
+        if identifier is None:
+            identifier = random.randint(1, 100)
+
+        self.quantity = quantity
+        self.product = Product(name=name, category_name=category, unit_price=unit_price, identifier=identifier)
+
+
+class Store:
+    AVAILABLE_PRODUCTS = [
+        AvailableProduct(quantity=2, name="Młotek", category=ProductCategory.TOOLS),
+        AvailableProduct(quantity=5, name="Chleb", category=ProductCategory.FOOD),
+        AvailableProduct(quantity=1, name="Kosiarka", category=ProductCategory.TOOLS),
+        AvailableProduct(quantity=1, name="Rower", category=ProductCategory.OTHER),
+    ]
+
+    @staticmethod
+    def reserve_product(product, quantity):
+
+        for available_product in Store.AVAILABLE_PRODUCTS:
+            if available_product.product == product:
+                print(f"dostepnosc:{available_product.quantity}")
+                if available_product.quantity >= quantity:
+                    available_product.quantity = available_product.quantity - quantity
+                    return
+                else:
+                    raise TemporaryOutOfStock(product.name, available_product.quantity)
+        raise ProductNotAvailable(product.name)
+
+
+
+
+plik: product.py
+
+from dataclasses import dataclass
+from enum import Enum
+
+
+class ProductCategory(Enum):
+    FOOD = "Jedzenie"
+    TOOLS = "Narzędzia"
+    OTHER = "Some category"
+
+
+@dataclass
+class Product:
+    name: str
+    category_name: ProductCategory
+    unit_price: int
+    identifier: int
+
+    def __str__(self):
+        return f'Name: {self.name} - Category: {self.category_name.value} - Unit Price: {self.unit_price}'
+
+
+@dataclass
+class ProductTerm(Product):
+    year_production: int
+    amount_years: int
+
+    def does_expire(self, current_year):
+        if (current_year - self.year_production) > self.amount_years:
+            return True
+        else:
+            return False
+
+
+
+
+plik: discount_policy.py
+
+class DiscountPolicy:
+
+    def apply_discount(self, total_price):
+        return total_price, "none"
+
+
+class PercentageDiscount(DiscountPolicy):
+    def __init__(self, percent_discount):
+        self.percent_discount = percent_discount
+
+    def apply_discount(self, total_price):
+        return total_price*self.percent_discount, "loyal"
+
+
+class AbsoluteDiscount(DiscountPolicy):
+    def __init__(self, decrease_value):
+        self.decrease_value = decrease_value
+
+    def apply_discount(self, total_price):
+        if total_price > 500:
+            return total_price-self.decrease_value, "holiday"
+        else:
+            return total_price, "none"
+
+
+
+plik: order_element.py
+
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.product import Product
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.tax_calculator import TaxCalculator
+from dataclasses import dataclass, field
+
+
+@dataclass
+class OrderElement:
+    product_info: Product
+    quantity_ord: int
+    tax: float = field(init=False)
+
+    def __post_init__(self):
+        self.tax = TaxCalculator.calculate_tax(self.total_price_f(), self.product_info.category_name)
+
+    def __str__(self):
+        return f'{self.product_info}\n\t\t x {self.quantity_ord}\n\t\t [Total price: {self.total_price_f()} - Tax: {self.tax}]'
+
+    def total_price_f(self):
+        return self.product_info.unit_price * self.quantity_ord
+
+
+plik: file_action.py
+
+import csv
+import os
+import json
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.store import AvailableProduct
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.product import ProductCategory
+
+
+# ZAD 1
+def save_json(order, org_orders_data):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "orders_j.json")
+    order_data = {
+        "orders": org_orders_data
+    }
+    new_order = {
+        "customer_first_name": order.customer_first_name,
+        "customer_last_name": order.customer_last_name,
+        "order_elements": [
+            {
+                "product_name": order_element.product_info.name,
+                "category_name": order_element.product_info.category_name.value,
+                "unit_price": order_element.product_info.unit_price,
+                "quantity": order_element.quantity_ord,
+                "tax": order_element.tax,
+                "payment": order_element.product_info.unit_price * order_element.quantity_ord
+            } for order_element in order.order_elements],
+        "total_price": order.total_price_origin
+    }
+
+    order_data["orders"].append(new_order)
+
+    try:
+        with open(path_file, mode="w") as orders_json:
+            json.dump(order_data, orders_json, indent=4)
+    except IOError:
+        print("Bład przy otwieraniu pliku!")
+    finally:
+        print("Zamykamy plik2")
+        orders_json.close()
+
+
+def load_json():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "orders_j.json")
+    try:
+        with open(path_file, mode="r") as orders_json:
+            content = orders_json.read().strip()
+            if not content:
+                print("Pusty plik")
+                return []
+            orders_json.seek(0)
+            orders_data = json.load(orders_json).get("orders", [])
+        return orders_data
+    except IOError:
+        print("Bład przy otwieraniu pliku!")
+    finally:
+        print("Zamykamy plik1")
+        orders_json.close()
+
+
+# ZAD 2
+def see_history_json(first_name, last_name, data_file):
+
+    for order in data_file:
+        if order["customer_first_name"] == first_name and order["customer_last_name"] == last_name:
+            print(order)
+
+
+def reader_store():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    store_available = []
+    with open(path_file, newline="") as available_store:
+        csv_reader = csv.reader(available_store)
+        print(csv_reader)
+        next(csv_reader)
+        for row_index, row in enumerate(csv_reader):
+            print(row[0])
+            product = AvailableProduct(quantity=int(row[4]), name=row[0], category=ProductCategory[row[1]], unit_price=int(row[2]), identifier=int(row[3]))
+            store_available.append(product)
+
+    return store_available
+
+
+def writer_store(currenty_store):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    with open(path_file, mode="w", newline="") as available_store_write:
+        csv_writer = csv.writer(available_store_write)
+        csv_writer.writerow(["name","category_name","unit_price","identifier","quantity"])
+        for product_next in currenty_store:
+            csv_writer.writerow(
+                [
+                    product_next.product.name,
+                    product_next.product.category_name.name,
+                    product_next.product.unit_price,
+                    product_next.product.identifier,
+                    product_next.quantity
+                ]
+            )
+
+
+def dict_reader_store():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    store_available = []
+    with open(path_file, newline="") as available_store:
+        csv_reader = csv.DictReader(available_store)
+        for row_index, row in enumerate(csv_reader):
+            print(row["name"])
+            product = AvailableProduct(quantity=int(row["quantity"]), name=row["name"], category=ProductCategory[row["category_name"]], unit_price=int(row["unit_price"]), identifier=int(row["identifier"]))
+            store_available.append(product)
+
+    return store_available
+
+
+def dict_writer_store(currenty_store):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "werhouse.csv")
+    with open(path_file, mode="w", newline="") as available_store_write:
+        header = ["name","category_name","unit_price","identifier","quantity"]
+
+        csv_writer = csv.DictWriter(available_store_write, fieldnames=header)
+        csv_writer.writeheader()
+        for product_next in currenty_store:
+            csv_writer.writerow(
+                {
+                    "name": product_next.product.name,
+                    "category_name": product_next.product.category_name.name,
+                    "unit_price": product_next.product.unit_price,
+                    "identifier": product_next.product.identifier,
+                    "quantity": product_next.quantity,
+                }
+            )
+
+
+def choose_action():
+    try:
+        a = int(input("1 - New Order\n"
+                  "2 - History Orders\n"
+                  ">> "))
+        if a == 1:
+            return 1
+        elif a == 2:
+            return 2
+    except ValueError:
+        print("Wrong input!")
+
+
+def see_history():
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "orders.txt")
+    try:
+        with open(path_file, mode="r") as orders_txt:
+            return orders_txt.read()
+    except IOError:
+        print("Bład przy otwieraniu pliku!")
+    finally:
+        print("Zamykamy plik")
+        orders_txt.close()
+
+
+def save_order(order):
+    c_dir = os.path.dirname(__file__)
+    path_file = os.path.join(c_dir, "..", "data", "orders.txt")
+    try:
+        with open(path_file, mode="a") as orders_txt:
+            orders_txt.write(str(order))
+            orders_txt.write("\n\n\n2")
+    except IOError:
+        print("Bład przy otwieraniu pliku!")
+    finally:
+        print("Zamykamy plik")
+        orders_txt.close()
+
+
+
+
+
+
+plik: data_generator.py
+
+import random
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.order_element import OrderElement
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.product import Product, ProductCategory
+from sekcja_5_obsluga_bledow_i_pliki.a5_7_praca_z_plikami_format_json.shop.order import Order
+
+
+UNIT_PRICE_MIN = 1
+UNIT_PRICE_MAX = 50
+QUANTITY_MIN = 1
+QUANTITY_MAX = 10
+
+
+def generate_order(max_element=None):
+
+    if max_element is None:
+        max_element = random.randint(1, Order.MAX_ELEMENT_ORDER)
+    order_elements = []
+    element_sample = random.sample(range(1, max_element + 20), max_element)
+    for i, prod in enumerate(element_sample):
+        if i % 2 == 0:
+            category = ProductCategory.TOOLS
+        elif i % 3 == 0:
+            category = ProductCategory.FOOD
+        else:
+            category = ProductCategory.OTHER
+        product = Product(name=f"Product-{str(prod)}", category_name=category,
+                          unit_price=random.randint(UNIT_PRICE_MIN, UNIT_PRICE_MAX), identifier=1)
+
+        element = OrderElement(product_info=product, quantity_ord=random.randint(QUANTITY_MIN, QUANTITY_MAX))
+        order_elements.append(element)
+
+    return order_elements
+
+
+
+plik: apple.py
+
+from dataclasses import dataclass
+
+
+@dataclass
+class Apple:
+    species: str = "Gold"
+    size: int = 2
+    price: int = 0
+    total_price: int = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+
+plik: potato.py
+
+from dataclasses import dataclass
+
+
+@dataclass
+class Potato:
+    species: str = "Lord"
+    size: int = 1
+    price: int = 0
+    total_price: int = 0
+
+    def total_price_f(self, weight):
+        self.total_price = weight * self.price
+
+
+tax_calculator.py:
+
+class TaxCalculator:
+    @staticmethod
+    def calculate_tax(total_price, category_name):
+        if category_name == "Owoce i warzywa":
+            return round(total_price * 0.05, 2)
+        elif category_name == "Jedzenie":
+            return round(total_price * 0.08, 2)
+        else:
+            return round(total_price * 0.20, 2)
+
+
